@@ -39,8 +39,8 @@ class TelemCtrl:
         self._file_path = QFileDialog.getOpenFileName(self._view, 'Open')[0]
         if self._file_path:
             self._data = self._model.process_data(self._file_path)
-            self._view.telem_view = 1
-            self._view.reiniUI(self._data)
+            self._view.data = self._data
+            self._view.reiniUI()
             self._data_tick = list(self._data.index.values)[1] - list(self._data.index.values)[0]
             self._telemViewSignals()
 

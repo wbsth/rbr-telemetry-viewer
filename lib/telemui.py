@@ -1,3 +1,5 @@
+import pandas as pd
+
 from lib.telemetrywidget import TelemetryWidget
 
 from PyQt5.QtCore import Qt
@@ -19,8 +21,8 @@ class TelemUI(QMainWindow):
         self.setMinimumSize(800, 600)
         # setting default grid type
         self.grid_type = (1, 1)
-        # setting default view to intro screen
-        self.telem_view = 0
+        # creating empty dataframe
+        self.data = pd.DataFrame()
         # creating menu
         self._createMenu()
         # setting main layout
@@ -30,29 +32,29 @@ class TelemUI(QMainWindow):
         self.setCentralWidget(self._centralWidget)
         self.initUI()
 
-    def initUI(self, data=None):
+    def initUI(self):
         """setting proper view depending on telem_view"""
-        if self.telem_view:
+        if not self.data.empty:
             # set telemetry screen, enable grid menu
             self.gridMenu.setDisabled(False)
-            self._telem_screen(data)
+            self._telem_screen()
         else:
             # set intro screen
             self._intro_screen()
 
-    def reiniUI(self, data):
+    def reiniUI(self):
         """Cleans general layout, then make new one"""
         self.clear_layout(self.generalLayout)
-        self.initUI(data)
+        self.initUI()
 
     def _intro_screen(self):
         """Displays intro screen at main layout"""
         self.introWidget = QLabel('<center>Load telemetry data using file menu (or use Ctrl+O)</center>')
         self.generalLayout.addWidget(self.introWidget, alignment=Qt.AlignCenter)
 
-    def _telem_screen(self, data):
+    def _telem_screen(self):
         """Displays telemetry screen at main layout"""
-        self.telem_widget = TelemetryWidget(self, self.generalLayout, self.grid_type, data)
+        self.telem_widget = TelemetryWidget(self, self.generalLayout, self.grid_type, self.data)
         self.generalLayout.addWidget(self.telem_widget, alignment=Qt.AlignCenter)
 
     def _createMenu(self):
