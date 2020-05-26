@@ -14,9 +14,6 @@ import matplotlib
 matplotlib.use('Qt5Agg')
 
 
-data = pd.DataFrame()
-
-
 def main():
     # initialize application
     rbrtelem = QApplication(sys.argv)
