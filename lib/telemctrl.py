@@ -36,7 +36,8 @@ class TelemCtrl:
 
     def open_file(self):
         """loads file path"""
-        self._file_path = QFileDialog.getOpenFileName(self._view, 'Open')[0]
+        self._file_path = QFileDialog.getOpenFileName(self._view, 'Open', "", "TSV files (*.tsv)")[0]
+
         if self._file_path:
             self._data = self._model.process_data(self._file_path)
             self._view.data = self._data
