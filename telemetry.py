@@ -1,5 +1,4 @@
 import sys
-import pandas as pd
 
 # helpers imports
 from lib.telemmodel import TelemModel
