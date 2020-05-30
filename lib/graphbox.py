@@ -1,8 +1,13 @@
+import sys
+
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QVBoxLayout
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QComboBox
-from lib.mplcanvas import MplCanvas
+
+from lib.SimpleGraph import SimpleGraph
+from lib.AdvGraphs import *
+
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as navigationToolbar
 
 
@@ -13,9 +18,12 @@ class GraphBox(QWidget):
         self._data = data
 
         # building list of possible graphs choices
+        self.proper_graphs = ['MapView', 'SuspHistogram.LF', 'SuspHistogram.RF', 'SuspHistogram.LB', 'SuspHistogram.RB', 'TireTemps']
+        self.direct_values = list(self._data.columns)[2:-1]
         self.possible_graphs = ['-']
-        test = list(self._data.columns)[2:-1]
-        self.possible_graphs.extend(test)
+        self.possible_graphs.extend(self.proper_graphs)
+        self.possible_graphs.extend('-')
+        self.possible_graphs.extend(self.direct_values)
 
         # setting layout
         self.lay = QVBoxLayout()
@@ -40,32 +48,27 @@ class GraphBox(QWidget):
             widget.deleteLater()
 
         if self._option != "-":
-            self.graph = MplCanvas(self, width=10, height=10, dpi=75)
-            self.graph.axes.plot(self._data[self._option], color='k', linewidth=1)
-            self.graph.axes.axvline(list(self._data.index.values)[0], color='r', label='-')
-            self.graph.axes.legend(loc='upper right')
-            self.graph.fig.set_tight_layout(True)
+            if self._option in self.direct_values:
+                # direct value graph
+                self.graph = SimpleGraph(self._data, self._option)
+            elif self._option in self.proper_graphs:
+                # advanced graphs, ex map view
+                # check if its
+                self._split_option = self._option.split(".")
+                if len(self._option) == 1:
+                    self.graph = eval(f"{self._split_option}(self._data, self._split_option)")
+                else:
+                    self.graph = eval(f"{self._split_option[0]}(self._data, self._split_option)")
+            else:
+                sys.exit()
+
             toolbar = navigationToolbar(self.graph, self)
             self.lay.addWidget(self.graph)
             self.lay.addWidget(toolbar)
             self.widgets = [self.graph, toolbar]
+
         else:
             self._createPlaceholder()
-
-    def update_graph(self, slider_value):
-        """Updates graph based on slider position"""
-        if type(self.widgets[0]) == MplCanvas:
-            # remove old vertical line
-            self.graph.axes.lines.remove(self.graph.axes.lines[-1])
-            # add new vertical line
-            value = self._data[self._option][slider_value]
-            if isinstance(value, float):
-                str_value = "{:.2f}".format(value)
-            else:
-                str_value = str(value)
-            self.graph.axes.axvline(slider_value, color='r', label=str_value)
-            self.graph.axes.legend(loc='upper right')
-            self.graph.draw()
 
     def _createPlaceholder(self):
         """Create placeholder if def value is selected in combo box"""
