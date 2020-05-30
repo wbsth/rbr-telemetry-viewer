@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtWidgets import QWidget
 
 
 class TelemCtrl:
@@ -27,7 +28,8 @@ class TelemCtrl:
         """Update graphs when slider position changes"""
         slider_value = self.sanitize_slider(self._view.telem_widget.slider.value())
         for i in self._view.telem_widget.grid_elements:
-            i.update_graph(slider_value)
+            if type(i.widgets[0]) != QWidget:
+                i.widgets[0].upd(slider_value)
 
     def sanitize_slider(self, slider_val):
         """Restrict slider values to match ticks"""
