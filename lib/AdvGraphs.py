@@ -26,7 +26,8 @@ class SuspHistogram(MplCanvas):
     def __init__(self, data, option):
         super(SuspHistogram, self).__init__(self)
         self._option = option
-        self._data = data[f"{self._option[1]}.deflectionVelocity"]
+        self._data = data.loc[data['speed'] != 0.00]
+        self._data = self._data[f"{self._option[1]}.deflectionVelocity"]
         self.fbump, self.bump, self.rebound, self.frebound, self.binlist = self.calculate()
         self.plot()
 
